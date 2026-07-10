@@ -1,10 +1,11 @@
-import { useState } from "react";
+import React, { useState } from 'react';
 import { Link, useNavigate } from "react-router-dom";
 import "./Login.css";
 
 function Login() {
     const navigate = useNavigate();
     const [showPassword, setShowPassword] = useState(false);
+    const [role, setRole] = useState("candidate");
     const [formData, setFormData] = useState({
         email: "",
         password: ""
@@ -19,11 +20,15 @@ function Login() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log("Login Details:", formData);
+        console.log("Login Details:", formData, "Role:", role);
         
-        // Backend authentication will be added later
-        alert("Login Successful");
-        navigate("/candidate");
+        alert(`Login Successful as ${role === 'recruiter' ? 'Recruiter' : 'Candidate'}`);
+        
+        if (role === "recruiter") {
+            navigate("/recruiter");
+        } else {
+            navigate("/candidate");
+        }
     };
 
     return (
@@ -33,6 +38,18 @@ function Login() {
                 <p>Login to continue your CareerForge journey</p>
 
                 <form onSubmit={handleSubmit}>
+                    <div className="input-group">
+                        <label>Login As</label>
+                        <select 
+                            value={role} 
+                            onChange={(e) => setRole(e.target.value)}
+                            style={{ padding: '10px', borderRadius: '6px', background: '#13002b', color: '#fff', border: '1px solid rgba(168, 85, 247, 0.4)' }}
+                        >
+                            <option value="candidate">Candidate / Student</option>
+                            <option value="recruiter">Recruiter / Company</option>
+                        </select>
+                    </div>
+
                     <div className="input-group">
                         <label>Email</label>
                         <input 
