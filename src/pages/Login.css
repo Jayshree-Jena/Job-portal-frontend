@@ -115,6 +115,22 @@
     background-color: #7c3aed;
 }
 
+.login-btn:disabled {
+    background-color: #6d28d9;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.error-text {
+    margin-top: 18px;
+    color: #fecaca;
+    background: rgba(248, 113, 113, 0.15);
+    border: 1px solid rgba(248, 113, 113, 0.3);
+    padding: 12px 14px;
+    border-radius: 10px;
+    font-size: 14px;
+}
+
 .bottom-text {
     margin-top: 24px;
     text-align: center;

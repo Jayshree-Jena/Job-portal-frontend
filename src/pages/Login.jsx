@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from "react-router-dom";
+import { login } from "../sevices/api";
 import "./Login.css";
 
 function Login() {
@@ -10,6 +11,8 @@ function Login() {
         email: "",
         password: ""
     });
+    const [error, setError] = useState("");
+    const [loading, setLoading] = useState(false);
 
     const handleChange = (e) => {
         setFormData({
@@ -18,16 +21,36 @@ function Login() {
         });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log("Login Details:", formData, "Role:", role);
-        
-        alert(`Login Successful as ${role === 'recruiter' ? 'Recruiter' : 'Candidate'}`);
-        
-        if (role === "recruiter") {
-            navigate("/recruiter");
-        } else {
-            navigate("/candidate");
+        setError("");
+        setLoading(true);
+
+        try {
+            const response = await login({
+                email: formData.email,
+                password: formData.password,
+                role
+            });
+
+            const token = response.token || response.accessToken || response?.data?.token;
+            const userName = response.user?.name || response.name || formData.email.split("@")[0];
+
+            if (!token) {
+                throw new Error("Authentication token not returned by backend.");
+            }
+
+            localStorage.setItem("token", token);
+            localStorage.setItem("name", userName);
+            localStorage.setItem("role", role);
+
+            alert(`Login Successful as ${role === 'recruiter' ? 'Recruiter' : 'Candidate'}`);
+            navigate(role === "recruiter" ? "/recruiter" : "/candidate");
+        } catch (err) {
+            console.error("Login failed:", err);
+            setError(err.response?.data?.message || err.message || "Login failed. Please check your credentials.");
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -83,10 +106,12 @@ function Login() {
                         </div>
                     </div>
 
-                    <button type="submit" className="login-btn">
-                        Login
+                    <button type="submit" className="login-btn" disabled={loading}>
+                        {loading ? "Logging in..." : "Login"}
                     </button>
                 </form>
+
+                {error && <div className="error-text">{error}</div>}
 
                 <div className="bottom-text">
                     Don't have an account? <Link to="/signup">Signup</Link>
